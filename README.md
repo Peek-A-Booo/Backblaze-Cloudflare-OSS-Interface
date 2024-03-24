@@ -25,7 +25,7 @@ Please carefully read "[Backblaze + Cloudflare搭建个人OSS](https://leezhian.
 
 ## Getting Started
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Peek-A-Booo/Backblaze-Cloudflare-OSS-Interface&env=APP_KEY_ID&env=APP_KEY&env=BUCKET_NAME&env=NEXT_PUBLIC_HOSTNAME)
 
 ### Environment Variables
 
