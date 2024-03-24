@@ -2,8 +2,8 @@ import { env } from '@/env.mjs'
 import { Redis, SetCommandOptions } from '@upstash/redis'
 
 const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL!,
-  token: env.UPSTASH_REDIS_REST_TOKEN!,
+  url: env.UPSTASH_REDIS_REST_URL || '',
+  token: env.UPSTASH_REDIS_REST_TOKEN || '',
 })
 
 export const getRedisValue = async (key: string): Promise<string> => {

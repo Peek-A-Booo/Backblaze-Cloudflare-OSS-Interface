@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 
 import { env } from '@/env.mjs'
 import { b2_authorize_account } from '@/lib/backblaze'
+import { CORS_HEADERS } from '@/lib/response'
+
+export const runtime = 'edge'
+
+export async function OPTIONS() {
+  return new Response(null, { headers: CORS_HEADERS })
+}
 
 export async function GET() {
   try {
