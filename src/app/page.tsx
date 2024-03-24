@@ -36,10 +36,10 @@ export default function Home() {
       disabled: loadingUpload,
     })
 
-  const getBuckets = () => {
+  const getLists = () => {
     setLoading(true)
 
-    fetch('/api/file')
+    fetch('/api/v1/file')
       .then((res) => res.json())
       .then((res) => {
         setLists(res.data)
@@ -87,7 +87,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    getBuckets()
+    getLists()
   }, [])
 
   useEffect(() => {

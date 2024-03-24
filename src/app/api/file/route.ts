@@ -4,33 +4,33 @@ import { NextResponse } from 'next/server'
 import { env } from '@/env.mjs'
 import { b2 } from '@/lib/b2'
 
-export async function GET() {
-  try {
-    await b2.authorize()
-    const bucketRes = await b2.getBucket({ bucketName: env.BUCKET_NAME })
-    const bucket = bucketRes.data.buckets[0]
-    const listRes = await b2.listFileNames({
-      bucketId: bucket.bucketId,
-      startFileName: '/',
-      // The maximum number of files returned per transaction is 1000. If you set maxFileCount to more than 1000 and more than 1000 are returned,
-      // the call will be billed as multiple transactions, as if you had made requests in a loop asking for 1000 at a time.
-      maxFileCount: 1000,
-      delimiter: '',
-      prefix: '',
-    })
-    const fileList = listRes.data.files.sort(
-      (a: any, b: any) => b.uploadTimestamp - a.uploadTimestamp,
-    )
+// export async function GET() {
+//   try {
+//     await b2.authorize()
+//     const bucketRes = await b2.getBucket({ bucketName: env.BUCKET_NAME })
+//     const bucket = bucketRes.data.buckets[0]
+//     const listRes = await b2.listFileNames({
+//       bucketId: bucket.bucketId,
+//       startFileName: '/',
+//       // The maximum number of files returned per transaction is 1000. If you set maxFileCount to more than 1000 and more than 1000 are returned,
+//       // the call will be billed as multiple transactions, as if you had made requests in a loop asking for 1000 at a time.
+//       maxFileCount: 1000,
+//       delimiter: '',
+//       prefix: '',
+//     })
+//     const fileList = listRes.data.files.sort(
+//       (a: any, b: any) => b.uploadTimestamp - a.uploadTimestamp,
+//     )
 
-    return NextResponse.json({ code: 0, data: fileList })
-  } catch (error: any) {
-    console.log(error.message, 'get error')
-    return NextResponse.json({
-      code: -1,
-      msg: error.message || 'Internal server error',
-    })
-  }
-}
+//     return NextResponse.json({ code: 0, data: fileList })
+//   } catch (error: any) {
+//     console.log(error.message, 'get error')
+//     return NextResponse.json({
+//       code: -1,
+//       msg: error.message || 'Internal server error',
+//     })
+//   }
+// }
 
 export async function POST(request: Request) {
   try {
