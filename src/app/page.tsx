@@ -1,40 +1,25 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
 import { PhotoProvider } from 'react-photo-view'
+import { useShallow } from 'zustand/react/shallow'
 import { toast } from 'sonner'
 
 import { ImageItem } from '@/components/modules/imageItem'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
-
-const maxFiles = 5
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useCommonStore } from '@/store/common'
 
 export default function Home() {
-  const [loading, setLoading] = useState(true)
-  const [lists, setLists] = useState<any[]>([])
-
-  const [loadingUpload, setLoadingUpload] = useState(false)
-  const [uploadFiles, setUploadFiles] = useState<any[]>([])
-  const [uploadProcess, setUploadProcess] = useState(0)
-
-  let { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      maxFiles,
-      disabled: loadingUpload,
-    })
+  const [loading, setLoading] = useCommonStore(
+    useShallow((state) => [state.loading, state.updateLoading]),
+  )
+  const [lists, setLists] = useCommonStore((state) => [
+    state.lists,
+    state.updateLists,
+  ])
+  const [type, setType] = useState('grid')
 
   const getLists = () => {
     setLoading(true)
@@ -54,141 +39,41 @@ export default function Home() {
       })
   }
 
-  const onUpload = async () => {
-    try {
-      setUploadProcess(0)
-      setLoadingUpload(true)
-
-      for (const file of uploadFiles) {
-        const formData = new FormData()
-        formData.append('file', file)
-        const res = await fetch('/api/v1/file', {
-          method: 'POST',
-          body: formData,
-        }).then((res) => res.json())
-
-        if (!res.code) {
-          setUploadProcess((prev) => {
-            if (prev + 1 === uploadFiles.length) {
-              acceptedFiles = []
-              setUploadFiles([])
-              toast.success('Upload success!')
-            }
-            return prev + 1
-          })
-          setLists((prev) => [res.data, ...prev])
-        } else {
-          toast.error(res.msg || 'Upload failed')
-        }
-      }
-    } catch (error) {
-    } finally {
-      setLoadingUpload(false)
-    }
-  }
-
   const onDelete = (fileId: string) => {
-    setLists((prev) => prev.filter((item) => item.fileId !== fileId))
+    setLists(lists.filter((item) => item.fileId !== fileId))
   }
 
   useEffect(() => {
     getLists()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    setUploadFiles(acceptedFiles)
-  }, [acceptedFiles])
-
-  useEffect(() => {
-    if (fileRejections.length) {
-      toast.error('Somthing went wrong!')
-    }
-  }, [fileRejections])
 
   return (
     <div className="container">
       <PhotoProvider>
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2 pt-4">
             <div className="flex items-center justify-between">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 Files
               </h3>
               <div>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button disabled={loading}>Upload</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle className="mb-4">
-                        Upload Files (max {maxFiles})
-                      </DialogTitle>
-                      <div
-                        className="flex h-28 cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted"
-                        {...getRootProps()}
-                      >
-                        <input {...getInputProps({ maxLength: 2 })} />
-                        <p
-                          className={cn({
-                            'text-muted-foreground': loadingUpload,
-                          })}
-                        >
-                          Drag drop some files here, or click to select files
-                        </p>
-                      </div>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-2">
-                      {uploadFiles.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="i-mingcute-attachment-line text-muted-foreground" />
-                            <div className="flex-1 text-sm">{file.name}</div>
-                          </div>
-                          {!loadingUpload && (
-                            <span
-                              className="i-mingcute-close-line flex-shrink-0 cursor-pointer"
-                              onClick={() => {
-                                acceptedFiles.splice(index, 1)
-                                setUploadFiles(
-                                  uploadFiles.filter((item) => item !== file),
-                                )
-                              }}
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        disabled={!uploadFiles.length || loadingUpload}
-                        onClick={onUpload}
-                      >
-                        {loadingUpload && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Upload
-                      </Button>
-                      {loadingUpload && (
-                        <>
-                          <div>
-                            {uploadProcess}/{uploadFiles.length}
-                          </div>
-                          <Progress
-                            value={(uploadProcess / uploadFiles.length) * 100}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Tabs value={type} onValueChange={setType}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="grid" className="gap-1">
+                      <span className="i-mingcute-grid-line" />
+                      <span className="hidden md:block">Grid</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="table" className="gap-1">
+                      <span className="i-mingcute-table-2-line" />
+                      <span className="hidden md:block">Table</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="h-[calc(100vh-170px)] overflow-y-auto pt-2">
             {loading ? (
               <div className="flex flex-col space-y-3">
                 <Skeleton className="h-[125px] w-[250px] rounded-xl" />

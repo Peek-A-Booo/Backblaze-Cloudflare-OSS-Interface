@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  height: 0.4rem;
+  width: 0.4rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(217, 217, 227, 0.8);
+  border-color: rgba(255, 255, 255, 1);
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
