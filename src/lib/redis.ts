@@ -24,3 +24,9 @@ export const setRedisValue = async (
     await redis.set(key, value, options)
   }
 }
+
+export const delRedisValue = async (key: string): Promise<void> => {
+  if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
+    await redis.del(key)
+  }
+}

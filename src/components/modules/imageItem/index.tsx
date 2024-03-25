@@ -35,7 +35,7 @@ export function ImageItem({
 
   const handleDelete = () => {
     setLoading(true)
-    fetch('/api/file', {
+    fetch('/api/v1/file', {
       method: 'DELETE',
       body: JSON.stringify({ fileId: item.fileId, fileName: item.fileName }),
     })

@@ -42,7 +42,12 @@ export default function Home() {
     fetch('/api/v1/file')
       .then((res) => res.json())
       .then((res) => {
-        setLists(res.data)
+        if (res.code) {
+          toast.error(res.msg)
+          setLists([])
+        } else {
+          setLists(res.data)
+        }
       })
       .finally(() => {
         setLoading(false)
@@ -57,7 +62,7 @@ export default function Home() {
       for (const file of uploadFiles) {
         const formData = new FormData()
         formData.append('file', file)
-        const res = await fetch('/api/file', {
+        const res = await fetch('/api/v1/file', {
           method: 'POST',
           body: formData,
         }).then((res) => res.json())

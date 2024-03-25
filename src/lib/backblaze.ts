@@ -22,28 +22,50 @@ export async function b2_authorize_account(): Promise<string[]> {
         },
       },
     ).then((res) => res.json())
-    if (
-      res.authorizationToken &&
-      res.accountId &&
-      res.apiInfo.storageApi.apiUrl
-    ) {
-      // 23 hours ===> 82800
-      // redis.set('key', 'value', { ex: 82800 })
-      setRedisValue(
+    if (res.authorizationToken && res.apiInfo.storageApi.apiUrl) {
+      await setRedisValue(
         'accountInfo',
-        `${res.authorizationToken},${res.accountId},${res.apiInfo.storageApi.apiUrl}`,
-        { ex: 82800 },
+        `${res.authorizationToken},${res.apiInfo.storageApi.apiUrl}`,
+        { ex: 3600 },
       )
-      return [
-        res.authorizationToken,
-        res.accountId,
-        res.apiInfo.storageApi.apiUrl,
-      ]
+      return [res.authorizationToken, res.apiInfo.storageApi.apiUrl]
     }
 
     throw new Error('Failed to authorize account')
   } catch (error) {
     console.log(error, 'b2_authorize_account error')
     throw new Error('Failed to authorize account')
+  }
+}
+
+export async function b2_get_upload_url(): Promise<string[]> {
+  try {
+    const [authorizationToken, apiUrl] = await b2_authorize_account()
+
+    const uploadInfo = await getRedisValue('uploadInfo')
+    if (uploadInfo) return uploadInfo.split(',')
+
+    const res = await fetch(
+      `${apiUrl}/b2api/v3/b2_get_upload_url?bucketId=${env.BUCKET_ID}`,
+      {
+        headers: {
+          Authorization: authorizationToken,
+        },
+      },
+    ).then((res) => res.json())
+
+    if (res.authorizationToken && res.uploadUrl) {
+      await setRedisValue(
+        'uploadInfo',
+        `${res.authorizationToken},${res.uploadUrl}`,
+        { ex: 3600 },
+      )
+      return [res.authorizationToken, res.uploadUrl]
+    }
+
+    throw new Error('Failed to get upload url')
+  } catch (error) {
+    console.log(error, 'b2_get_upload_url error')
+    throw new Error('Failed to get upload url')
   }
 }
