@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.2
+
+### Add
+
+- Support display modes of grid and table
+
 ## v0.1.1
 
 ### Breaking
