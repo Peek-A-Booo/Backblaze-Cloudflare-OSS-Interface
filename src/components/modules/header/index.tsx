@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useShallow } from 'zustand/react/shallow'
+import Link from 'next/link'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -88,7 +89,7 @@ export function Header() {
   return (
     <div className="fixed left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b border-border/40 bg-background/95 px-4 backdrop-blur">
       <div className="container flex items-center justify-between font-semibold">
-        <div>Backblaze Interface</div>
+        <Link href="/">Backblaze Interface</Link>
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogTrigger asChild>
             <Button
