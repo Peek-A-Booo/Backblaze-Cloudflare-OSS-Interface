@@ -10,7 +10,7 @@ interface CommonStore {
 }
 
 export const useCommonStore = create<CommonStore>((set, get) => ({
-  loading: false,
+  loading: true,
   lists: [],
 
   updateLoading: (loading) => set({ loading }),

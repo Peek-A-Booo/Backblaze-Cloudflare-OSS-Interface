@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { PhotoProvider } from 'react-photo-view'
 import { useShallow } from 'zustand/react/shallow'
 import { toast } from 'sonner'
 
-import { ImageItem } from '@/components/modules/imageItem'
+import { GridData } from '@/components/modules/content/grid'
+import { TableData } from '@/components/modules/content/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -15,10 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useCommonStore(
     useShallow((state) => [state.loading, state.updateLoading]),
   )
-  const [lists, setLists] = useCommonStore((state) => [
-    state.lists,
-    state.updateLists,
-  ])
+  const setLists = useCommonStore((state) => state.updateLists)
   const [type, setType] = useState('grid')
 
   const getLists = () => {
@@ -39,11 +37,12 @@ export default function Home() {
       })
   }
 
-  const onDelete = (fileId: string) => {
-    setLists(lists.filter((item) => item.fileId !== fileId))
-  }
+  useLayoutEffect(() => {
+    const localType = localStorage.getItem('display-mode')
+    if (localType && ['table', 'grid'].includes(localType)) {
+      setType(localType)
+    }
 
-  useEffect(() => {
     getLists()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -58,7 +57,13 @@ export default function Home() {
                 Files
               </h3>
               <div>
-                <Tabs value={type} onValueChange={setType}>
+                <Tabs
+                  value={type}
+                  onValueChange={(value) => {
+                    localStorage.setItem('display-mode', value)
+                    setType(value)
+                  }}
+                >
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="grid" className="gap-1">
                       <span className="i-mingcute-grid-line" />
@@ -83,15 +88,7 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                {lists.map((item) => (
-                  <ImageItem
-                    key={item.fileId}
-                    item={item}
-                    onDelete={onDelete}
-                  />
-                ))}
-              </div>
+              <>{type === 'grid' ? <GridData /> : <TableData />}</>
             )}
           </CardContent>
         </Card>
