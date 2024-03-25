@@ -10,6 +10,7 @@ export const env = createEnv({
     BUCKET_ID: z.string().min(1),
     UPSTASH_REDIS_REST_URL: z.string().optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    ACCESS_CODE: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_HOSTNAME: z.string().min(1),

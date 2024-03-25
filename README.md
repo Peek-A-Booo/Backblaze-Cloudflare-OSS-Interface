@@ -12,9 +12,9 @@ Inspired by [Backblaze + Cloudflare搭建个人OSS](https://leezhian.com/faq/oth
 
 ## Roadmap
 
+- [x] Basic permission verification (to avoid direct viewing of all documents)
 - [ ] Batch delete
 - [ ] Pagination of Data
-- [ ] Basic permission verification (to avoid direct viewing of all documents)
 
 ## Before You Start
 
@@ -96,5 +96,9 @@ After completing the creation, you will receive the following information:
 #### `UPSTASH_REDIS_REST_TOKEN` (optional)
 
 Look up ⬆️
+
+#### `ACCESS_CODE` (optional)
+
+If configured, validation must be completed before entering the system.
 
 ### Enjoy

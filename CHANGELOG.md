@@ -5,6 +5,7 @@
 ### Add
 
 - Support display modes of grid and table
+- Add `ACCESS_CODE` to protect the access of the website
 
 ## v0.1.1
 
