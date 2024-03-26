@@ -1,51 +1,33 @@
 'use client'
 
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { PhotoProvider } from 'react-photo-view'
-import { useShallow } from 'zustand/react/shallow'
 import { toast } from 'sonner'
+import useSWR from 'swr'
 
 import { GridData } from '@/components/modules/content/grid'
 import { TableData } from '@/components/modules/content/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useCommonStore } from '@/store/common'
+
+const fetcher = async (url: string) => fetch(url).then((r) => r.json())
 
 export default function Home() {
-  const [loading, setLoading] = useCommonStore(
-    useShallow((state) => [state.loading, state.updateLoading]),
-  )
-  const setLists = useCommonStore((state) => state.updateLists)
+  const { data, error, isLoading } = useSWR('/api/v1/file', fetcher)
+
   const [type, setType] = useState('grid')
-
-  const getLists = () => {
-    setLoading(true)
-
-    fetch('/api/v1/file')
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.code) {
-          toast.error(res.msg)
-          setLists([])
-        } else {
-          setLists(res.data)
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }
 
   useLayoutEffect(() => {
     const localType = localStorage.getItem('display-mode')
     if (localType && ['table', 'grid'].includes(localType)) {
       setType(localType)
     }
-
-    getLists()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (data?.code) toast.error(data?.msg)
+  }, [data])
 
   return (
     <div className="container">
@@ -79,7 +61,7 @@ export default function Home() {
             </div>
           </CardHeader>
           <CardContent className="h-[calc(100vh-170px)] overflow-y-auto pt-2">
-            {loading ? (
+            {isLoading ? (
               <div className="flex flex-col space-y-3">
                 <Skeleton className="h-[125px] w-[250px] rounded-xl" />
                 <div className="space-y-2">
@@ -87,6 +69,8 @@ export default function Home() {
                   <Skeleton className="h-4 w-[200px]" />
                 </div>
               </div>
+            ) : error ? (
+              <div>Error</div>
             ) : (
               <>{type === 'grid' ? <GridData /> : <TableData />}</>
             )}

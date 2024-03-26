@@ -26,6 +26,13 @@ export async function GET() {
       },
     ).then((res) => res.json())
 
+    if (!res.files) {
+      return NextResponse.json({
+        code: -1,
+        msg: res.code || 'Internal server error',
+      })
+    }
+
     return NextResponse.json({
       code: 0,
       data: res.files.sort(

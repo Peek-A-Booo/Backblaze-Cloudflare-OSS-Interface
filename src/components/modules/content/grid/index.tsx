@@ -1,14 +1,16 @@
+import { useSWRConfig } from 'swr'
+
 import { ImageItem } from '@/components/modules/imageItem'
-import { useCommonStore } from '@/store/common'
 
 export function GridData() {
-  const [lists, setLists] = useCommonStore((state) => [
-    state.lists,
-    state.updateLists,
-  ])
+  const { cache, mutate } = useSWRConfig()
+
+  const lists: any[] = cache.get('/api/v1/file')?.data?.data || []
 
   const onDelete = (fileId: string) => {
-    setLists(lists.filter((item) => item.fileId !== fileId))
+    mutate('/api/v1/file', {
+      data: lists.filter((item) => item.fileId !== fileId),
+    })
   }
 
   return (

@@ -66,6 +66,15 @@ export default function Login() {
               placeholder="Enter code"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(event) => {
+                if (
+                  (event.keyCode === 13 || event.keyCode === 10) &&
+                  !event.shiftKey
+                ) {
+                  event.preventDefault()
+                  onLogin()
+                }
+              }}
             />
           </div>
         </CardContent>

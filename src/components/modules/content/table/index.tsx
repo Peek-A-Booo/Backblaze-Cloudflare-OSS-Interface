@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { PhotoView } from 'react-photo-view'
 import { formatDistance } from 'date-fns'
 import { toast } from 'sonner'
+import { useSWRConfig } from 'swr'
 
 import {
   AlertDialog,
@@ -34,15 +35,13 @@ import {
 import { env } from '@/env.mjs'
 import { useCopy } from '@/hooks/useCopy'
 import { formatSize } from '@/lib/format'
-import { useCommonStore } from '@/store/common'
 
 export function TableData() {
+  const { cache, mutate } = useSWRConfig()
   const [loading, setLoading] = useState(false)
-  const [lists, setLists] = useCommonStore((state) => [
-    state.lists,
-    state.updateLists,
-  ])
   const [, copy] = useCopy()
+
+  const lists: any[] = cache.get('/api/v1/file')?.data?.data || []
 
   const handleDelete = (item: any) => {
     setLoading(true)
@@ -54,7 +53,9 @@ export function TableData() {
       .then((res) => {
         if (!res.code) {
           toast.success('Deleted successfully')
-          setLists(lists.filter((list) => list.fileId !== item.fileId))
+          mutate('/api/v1/file', {
+            data: lists.filter((list) => list.fileId !== item.fileId),
+          })
         } else {
           toast.error(res.msg || 'Delete failed')
         }

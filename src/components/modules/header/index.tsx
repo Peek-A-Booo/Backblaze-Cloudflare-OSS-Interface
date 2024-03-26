@@ -3,9 +3,9 @@
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { useShallow } from 'zustand/react/shallow'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { useSWRConfig } from 'swr'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -17,13 +17,11 @@ import {
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
-import { useCommonStore } from '@/store/common'
 
 const maxFiles = 5
 
 export function Header() {
-  const loading = useCommonStore(useShallow((state) => state.loading))
-  const addList = useCommonStore((state) => state.addList)
+  const { cache, mutate } = useSWRConfig()
   const [loadingUpload, setLoadingUpload] = useState(false)
   const [uploadFiles, setUploadFiles] = useState<any[]>([])
   const [uploadProcess, setUploadProcess] = useState(0)
@@ -36,6 +34,10 @@ export function Header() {
     })
 
   const onOpenChange = (isOpen: boolean) => {
+    if (cache.get('/api/v1/file')?.isLoading) {
+      return toast.warning('Loading data...')
+    }
+
     if (open) {
       acceptedFiles = []
       setUploadFiles([])
@@ -75,7 +77,10 @@ export function Header() {
             }
             return prev + 1
           })
-          addList(res.data)
+          // addList(res.data)
+          mutate('/api/v1/file', {
+            data: [...cache.get('/api/v1/file')?.data.data, res.data],
+          })
         } else {
           toast.error(res.msg || 'Upload failed')
         }
@@ -96,7 +101,7 @@ export function Header() {
               variant="outline"
               className="gap-1.5"
               size="sm"
-              disabled={loading}
+              // disabled={cache.get('/api/v1/file')?.isLoading}
             >
               <span className="i-mingcute-upload-line h-4 w-4" />
               <span className="hidden md:block">Upload</span>
