@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js'
 import { nanoid } from 'nanoid'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 import { env } from '@/env.mjs'
@@ -15,6 +16,18 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
+    if (env.ACCESS_CODE) {
+      const cookieStore = cookies()
+      const accessCode = cookieStore.get('Access-Code')?.value
+
+      if (env.ACCESS_CODE !== accessCode) {
+        return NextResponse.json({
+          code: -1,
+          msg: 'Access code is invalid',
+        })
+      }
+    }
+
     const [authorizationToken, apiUrl] = await b2_authorize_account()
 
     const res = await fetch(
@@ -111,6 +124,18 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (env.ACCESS_CODE) {
+      const cookieStore = cookies()
+      const accessCode = cookieStore.get('Access-Code')?.value
+
+      if (env.ACCESS_CODE !== accessCode) {
+        return NextResponse.json({
+          code: -1,
+          msg: 'Access code is invalid',
+        })
+      }
+    }
+
     const { fileId, fileName } = await request.json()
 
     const [authorizationToken, apiUrl] = await b2_authorize_account()
